@@ -52,3 +52,20 @@ def like_toggle(request, post_id):
     }
     return HttpResponse(json.dumps(context), content_type = "application/json")
     
+@login_required
+@require_POST
+def dislike_toggle(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    post_dislike, post_dislike_created = Dislike.objects.get_or_create(user=request.user, post=post)
+
+    if not post_dislike_created:
+        post_dislike.delete()
+        result = "dislike_cancel"
+    else:
+        result = "dislike"
+
+    context = {
+        "dislike_count":post.dislike_count,
+        "result":result
+    }
+    return HttpResponse(json.dumps(context), content_type="application/json")     
