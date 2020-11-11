@@ -23,6 +23,22 @@
         <a href="{% url 'items:delete' post.pk %}"> 삭제하기 </a>
     {% endif %}
 
+    <form action="#" method="POST" style="margin-top: 50px;" class="create-comment-form">
+        {% csrf_token %}
+        <div class="form-group">
+            <textarea class="form-control" name="content" id="comment-input-{{ post.pk }}" placeholder="댓글 작성..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary comment-submit-button" data-post-id="{{ post.pk }}">작성</button>
+    </form><br>
+
+    {% if comments %}
+        <ul class="list-group" id="comments-list-{{ post.pk }}" style="margin-top: 40px;">
+            {% for comment in comments %}
+                {% include 'comments/_comment.html' with comment=comment user=user %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+
     <span href="#" class="like" name ="{{post.id}}" value="Like"> 
 
         {% if user in post.like_user_set.all %} <!-- post의 like_user_set -->
@@ -152,6 +168,32 @@
 
         })
     })
+
+    $('.comment-submit-button').click(function(e){ //작성하기 버튼 눌렀을 때
+        e.preventDefault();
+        const postId = $(this).data('post-id'); //데이터 속성
+        const commentMessage = $(`#comment-input-${postId}`).val();
+        console.log(commentMessage)
+        if (commentMessage === '') { //댓글 내용이 없을 때
+            alert('댓글 내용을 입력해주세요.');
+        } else { //댓글 내용이 있을 때
+            $.ajax({
+                url: "{% url 'items:create_comment' post.pk %}",
+                type: "POST",
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    'content': commentMessage
+                },
+                success: function(response) { //성공
+                    $(`#comments-list-${postId}`).prepend(response.comment); //생성된 댓글의 내용 넣기
+                    $(`#comment-input-${postId}`).val('');
+                },
+                error: function(response) {
+                    alert('오류가 발생했습니다.');
+                }
+            });
+        }
+    });
             
 </script>
 
