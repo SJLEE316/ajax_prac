@@ -95,6 +95,7 @@
     
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script>
+    //게시글 좋아요
     $(".like").click(function(){
         var pk = $(this).attr('name') // this -> class가 like인 것
         $.ajax({
@@ -132,6 +133,7 @@
         })
     })
 
+    //게시글 싫어요
     $(".dislike").click(function(){
         var pk = $(this).attr('name')
         $.ajax({
@@ -169,6 +171,7 @@
         })
     })
 
+    //댓글 작성
     $('.comment-submit-button').click(function(e){ //작성하기 버튼 눌렀을 때
         e.preventDefault();
         const postId = $(this).data('post-id'); //데이터 속성
@@ -194,7 +197,29 @@
             });
         }
     });
-            
+
+    //댓글 삭제
+    //comment delete ajax
+    $('.comment-delete-button').click(function(e){
+        e.preventDefault();
+        const commentId = $(this).data('comment-id');
+        const commentMessage = $(`#comment-delete-${commentId}`).val();
+        console.log(commentMessage)
+            $.ajax({
+                url: `../../delete_comment/${commentId}/`,
+                type: "POST",
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                },
+                success: function(response) { //성공
+                    $(`#comment-${commentId}`).remove(); //삭제ㄱ
+                },
+                error: function(response) {
+                    alert('왓츠 프라블럼?');
+                }
+            });
+    });
+
 </script>
 
 

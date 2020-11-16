@@ -89,3 +89,14 @@ def create_comment(request, post_id):
         'comment': rendered
     }
     return HttpResponse(json.dumps(context), content_type="application/json")
+
+#댓글 삭제하기
+def delete_comment(request, comment_id):
+    user = request.user
+    comment=get_object_or_404(Comment,pk=comment_id)
+    comment.delete() #이놈 까묵지 말자,,, 이놈 없으면 삭제된 듯 보여도 새로고침하면 다시 등판함
+    rendered = render_to_string('comments/_comment.html', { 'comment': comment, 'user': request.user})
+    context={
+        'comment': rendered
+    }
+    return HttpResponse(json.dumps(context), content_type="application/json")
